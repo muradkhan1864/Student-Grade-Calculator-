@@ -434,14 +434,47 @@ class GradeCalculatorApp:
         except Exception as e:
             messagebox.showerror("Error",f"Failed to load file: {e}")
 
-    # ---------------- Visualization placeholder ----------------
+          # ---------------- Visualization ----------------
     def visualize_overall(self):
-        # placeholder for future visualization
-        messagebox.showinfo("Visualization","Feature coming soon: overall statistics & charts.")
+        import pandas as pd
+        import matplotlib.pyplot as plt
 
+        if not self.students:
+            messagebox.showwarning("No Data", "No student data to visualize.")
+            return
+
+        # Prepare data
+        data = []
+        for sid, s in self.students.items():
+            data.append({
+                "ID": sid,
+                "Name": s["name"],
+                "Average": s["average"],
+                "Grade": s["grade"]
+            })
+        df = pd.DataFrame(data)
+
+        # Grade distribution (pie chart)
+        grade_counts = df["Grade"].value_counts()
+        plt.figure(figsize=(10, 4))
+
+        plt.subplot(1, 2, 1)
+        plt.pie(grade_counts, labels=grade_counts.index, autopct="%1.1f%%", startangle=140)
+        plt.title("Grade Distribution")
+
+        # Average marks (bar chart)
+        plt.subplot(1, 2, 2)
+        plt.bar(df["Name"], df["Average"])
+        plt.xticks(rotation=45, ha="right")
+        plt.title("Average Marks per Student")
+        plt.ylabel("Average (%)")
+        plt.tight_layout()
+
+        plt.show()
 # ---------------- Run ----------------
 if __name__=="__main__":
     # create main window and run app
     root=tk.Tk()
     app=GradeCalculatorApp(root)
     root.mainloop()
+
